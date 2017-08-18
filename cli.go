@@ -11,6 +11,8 @@ func main() {
 	serve := flag.String("serve", "", "serve update data (e.g.: :8080)")
 	addr := flag.String("addr", "", "connect to server (e.g.: http://localhost:8080)")
 	dataDir := flag.String("data", "data", "set data directory to download updates to")
+	secretKey := flag.String("secret", "", "set secret key for authentication")
+
 	flag.Parse()
 
 	if *serve == "" && *addr == "" {
@@ -30,14 +32,14 @@ func main() {
 
 	if *serve != "" {
 		fmt.Println("Serving", *dataDir, " on", *serve)
-		err := ServeStatic(":8080", &hashes, "./"+*dataDir)
+		err := ServeStatic(":8080", *secretKey, &hashes, "./"+*dataDir)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 	} else if *addr != "" {
 		fmt.Println("Checking update data using", *addr)
-		outdated, err := CheckUpdates(*addr, hashes)
+		outdated, err := CheckUpdates(*addr, *secretKey, hashes)
 
 		if err != nil {
 			log.Fatal(err)
@@ -48,7 +50,7 @@ func main() {
 
 			for _, file := range outdated {
 				fmt.Printf("Downloading file: %s\n", file)
-				size, err := Download(*addr, file, "./"+*dataDir)
+				size, err := Download(*addr, *secretKey, file, "./"+*dataDir)
 
 				if err != nil {
 					log.Fatal(err)

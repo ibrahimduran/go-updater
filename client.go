@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -9,8 +10,8 @@ import (
 	"strings"
 )
 
-func CheckUpdates(addr string, hashes map[string]string) ([]string, error) {
-	checksums, err := readChecksum(addr)
+func CheckUpdates(addr string, secretKey string, hashes map[string]string) ([]string, error) {
+	checksums, err := readChecksum(addr + "/?secret=" + secretKey)
 
 	if err != nil {
 		return nil, err
@@ -27,8 +28,12 @@ func CheckUpdates(addr string, hashes map[string]string) ([]string, error) {
 	return outdated, nil
 }
 
-func Download(addr string, file string, dir string) (int64, error) {
-	resp, err := http.Get(addr + "/data/" + file)
+func Download(addr string, secretKey string, file string, dir string) (int64, error) {
+	resp, err := http.Get(addr + "/data/" + file + "?secret=" + secretKey)
+
+	if resp.StatusCode == http.StatusForbidden {
+		return 0, errors.New("server returned 403 Forbidden! try setting a secret key")
+	}
 
 	if err != nil {
 		return 0, err
@@ -54,6 +59,10 @@ func Download(addr string, file string, dir string) (int64, error) {
 
 func readChecksum(addr string) (map[string]string, error) {
 	resp, err := http.Get(addr)
+
+	if resp.StatusCode == http.StatusForbidden {
+		return nil, errors.New("server returned 403 Forbidden! try setting a secret key")
+	}
 
 	if err != nil {
 		return nil, err
