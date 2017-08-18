@@ -32,7 +32,7 @@ func main() {
 	addr := flag.String("addr", "", "connect to server (e.g.: http://localhost:8080)")
 	flag.Parse()
 
-	hashes, err := GetHashes(localDataDir)
+	hashes, err := MD5Dir(localDataDir)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func md5file(file string) []byte {
+func MD5File(file string) []byte {
 	f, err := os.Open(file)
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +26,7 @@ func md5file(file string) []byte {
 	return h.Sum(nil)
 }
 
-func GetHashes(dir string) (map[string]string, error) {
+func MD5Dir(dir string) (map[string]string, error) {
 	path, err := filepath.Abs(dir)
 
 	if err != nil {
@@ -55,7 +55,7 @@ func GetHashes(dir string) (map[string]string, error) {
 
 			file = strings.Replace(file, string(filepath.Separator), "/", -1)
 
-			hash := hex.EncodeToString(md5file(path))
+			hash := hex.EncodeToString(MD5File(path))
 			hashes[file] = hash
 		}
 
