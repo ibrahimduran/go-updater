@@ -28,7 +28,7 @@ func CheckUpdates(addr string, hashes map[string]string) ([]string, error) {
 }
 
 func Download(addr string, file string, dir string) (int64, error) {
-	resp, err := http.Get(addr + "/" + file)
+	resp, err := http.Get(addr + "/data/" + file)
 
 	if err != nil {
 		return 0, err
@@ -53,7 +53,7 @@ func Download(addr string, file string, dir string) (int64, error) {
 }
 
 func readChecksum(addr string) (map[string]string, error) {
-	resp, err := http.Get(addr + "/CHECKSUM.txt")
+	resp, err := http.Get(addr)
 
 	if err != nil {
 		return nil, err

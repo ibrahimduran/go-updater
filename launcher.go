@@ -7,40 +7,34 @@ import (
 	"os"
 )
 
-var publicDir = "./public"
-var localDataDir = "./public/data"
-var remoteDataDir = "/data/"
-
-func writeHashes(hashes map[string]string) error {
-	f, err := os.Create(publicDir + "/CHECKSUM.txt")
-
-	if err != nil {
-		return err
-	}
-
-	for path, hash := range hashes {
-		f.Write([]byte(path + " " + hash + "\n"))
-	}
-
-	defer f.Close()
-
-	return nil
-}
-
 func main() {
 	serve := flag.String("serve", "", "serve update data (e.g.: :8080)")
 	addr := flag.String("addr", "", "connect to server (e.g.: http://localhost:8080)")
+	dataDir := flag.String("data", "data", "set data directory to download updates to")
 	flag.Parse()
 
-	hashes, err := MD5Dir(localDataDir)
+	if *serve == "" && *addr == "" {
+		flag.Usage()
+	} else {
+		err := os.MkdirAll("./"+*dataDir, 0777)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	hashes, err := MD5Dir("./" + *dataDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	if *serve != "" {
-		fmt.Println("Serving on", *serve)
-		writeHashes(hashes)
-		ServeStatic(":8080", publicDir)
+		fmt.Println("Serving", *dataDir, " on", *serve)
+		err := ServeStatic(":8080", &hashes, "./"+*dataDir)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else if *addr != "" {
 		fmt.Println("Checking update data using", *addr)
 		outdated, err := CheckUpdates(*addr, hashes)
@@ -54,7 +48,7 @@ func main() {
 
 			for _, file := range outdated {
 				fmt.Printf("Downloading file: %s\n", file)
-				size, err := Download(*addr+remoteDataDir, file, localDataDir)
+				size, err := Download(*addr, file, "./"+*dataDir)
 
 				if err != nil {
 					log.Fatal(err)
@@ -65,7 +59,5 @@ func main() {
 		} else {
 			fmt.Println("Outdated files not found")
 		}
-	} else {
-		flag.Usage()
 	}
 }
