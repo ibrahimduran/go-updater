@@ -31,7 +31,7 @@ func main() {
 	}
 
 	if *serve != "" {
-		fmt.Println("Serving", *dataDir, " on", *serve)
+		fmt.Printf("Serving ./%s on %s", *dataDir, *serve)
 		err := ServeStatic(":8080", *secretKey, &hashes, "./"+*dataDir)
 
 		if err != nil {
