@@ -17,12 +17,12 @@ func main() {
 
 	if *serve == "" && *addr == "" {
 		flag.Usage()
-	} else {
-		err := os.MkdirAll("./"+*dataDir, 0777)
+		return
+	}
 
-		if err != nil {
-			log.Fatal(err)
-		}
+	err := os.MkdirAll("./"+*dataDir, 0777)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	hashes, err := MD5Dir("./" + *dataDir)
