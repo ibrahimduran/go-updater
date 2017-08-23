@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	serve := flag.String("serve", "", "serve update data (e.g.: :8080)")
+	serve := flag.String("serve", "", "local address to serve update data (e.g.: :8080)")
 	addr := flag.String("addr", "", "connect to server (e.g.: http://localhost:8080)")
-	dataDir := flag.String("data", "data", "set data directory to download updates to")
+	dataDir := flag.String("data", "data", "set data directory for download/upload content")
 	secretKey := flag.String("secret", "", "set secret key for authentication")
 
 	flag.Parse()
